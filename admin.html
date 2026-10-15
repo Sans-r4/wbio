@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Hub Admin Panel</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-deep: #09090e;
+      --panel-bg: rgba(22, 22, 34, 0.78);
+      --card-bg: rgba(255, 255, 255, 0.045);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --input-bg: rgba(10, 10, 16, 0.8);
+      --input-border: rgba(255, 255, 255, 0.12);
+      --input-focus: #6366f1;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --danger: #ef4444;
+      --success: #10b981;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--bg-deep);
+      background-image:
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.14), transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(236, 72, 153, 0.12), transparent 40%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      padding: 24px 16px 64px;
+    }
+
+    .app-shell {
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Glass Panel Container */
+    .panel {
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 12px;
+    }
+
+    .panel-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    /* Form Controls */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .char-count {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 12px;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 14px 0 18px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .checkbox-row input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    /* Cover Option Tabs */
+    .tabs {
+      display: flex;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--input-border);
+      margin-bottom: 12px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 8px 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Upload Dropzone */
+    .upload-zone {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      border: 1.5px dashed rgba(255, 255, 255, 0.18);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.02);
+      cursor: pointer;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.06);
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .crop-thumb {
+      width: 58px;
+      height: 58px;
+      aspect-ratio: 1 / 1;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .upload-meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .upload-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .upload-hint {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px 20px;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s, background-color 0.2s, opacity 0.2s;
+      width: 100%;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: #ffffff;
+      box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.6);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-main);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .btn-sm {
+      width: auto;
+      padding: 7px 12px;
+      font-size: 0.8rem;
+      border-radius: 9px;
+    }
+
+    /* Live Preview Card (Matches index.html 1:1) */
+    .preview-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .preview-box {
+      padding: 16px;
+      border-radius: 16px;
+      background: #0a0a0f;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 18px;
+    }
+
+    .hub-preview-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      padding: 10px 16px 10px 10px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      color: var(--text-main);
+      text-decoration: none;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.55),
+                  inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .hub-preview-cover {
+      width: 64px;
+      height: 64px;
+      aspect-ratio: 1 / 1;
+      border-radius: 12px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+    }
+
+    .hub-preview-text {
+      flex: 1;
+      min-width: 0;
+      font-size: 1.02rem;
+      font-weight: 600;
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: break-word;
+    }
+
+    .hub-preview-arrow {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    /* Existing Links List */
+    .manage-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .manage-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+    }
+
+    .manage-cover {
+      width: 48px;
+      height: 48px;
+      aspect-ratio: 1 / 1;
+      border-radius: 10px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .manage-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .manage-title {
+      font-size: 0.92rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .manage-url {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+
+    .manage-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.15s, color 0.15s;
+    }
+
+    .icon-btn:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .icon-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .icon-btn.danger:hover:not(:disabled) {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #f8fafc;
+      padding: 12px 20px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 1000;
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast.success {
+      border-color: rgba(16, 185, 129, 0.5);
+      background: rgba(6, 78, 59, 0.95);
+    }
+
+    .toast.error {
+      border-color: rgba(239, 68, 68, 0.5);
+      background: rgba(127, 29, 29, 0.95);
+    }
+
+    .repo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.76rem;
+      color: #a5b4fc;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.28);
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-top: 6px;
+    }
+
+    .toolbar-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-shell">
+    <!-- 1. LOGIN / GITHUB SETUP SCREEN -->
+    <section id="auth-screen" class="panel">
+      <div class="panel-header">
+        <div>
+          <h1 class="panel-title">🔒 Hub Admin Login</h1>
+          <p class="panel-subtitle">Connect your GitHub repository to manage and publish links directly.</p>
+        </div>
+      </div>
+
+      <form id="auth-form">
+        <div class="form-group">
+          <div class="label-row"><label for="gh-owner">GitHub Username / Owner</label></div>
+          <input type="text" id="gh-owner" class="input-field" placeholder="e.g. octocat" required autocomplete="username" />
+        </div>
+
+        <div class="input-row">
+          <div class="form-group">
+            <div class="label-row"><label for="gh-repo">Repository Name</label></div>
+            <input type="text" id="gh-repo" class="input-field" placeholder="e.g. tiktok-links" required />
+          </div>
+          <div class="form-group">
+            <div class="label-row"><label for="gh-branch">Branch</label></div>
+            <input type="text" id="gh-branch" class="input-field" value="main" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="label-row"><label for="gh-token">GitHub Personal Access Token (PAT)</label></div>
+          <input type="password" id="gh-token" class="input-field" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" required autocomplete="current-password" />
+        </div>
+
+        <label class="checkbox-row">
+          <input type="checkbox" id="save-creds" checked />
+          <span>Remember credentials on this device (`localStorage`)</span>
+        </label>
+
+        <button type="submit" id="auth-submit-btn" class="btn btn-primary">
+          <span>Verify & Unlock Admin</span>
+        </button>
+      </form>
+    </section>
+
+    <!-- 2. UNLOCKED ADMIN PANEL -->
+    <main id="admin-screen" class="hidden">
+      <!-- Top Bar -->
+      <div class="panel">
+        <div class="panel-header" style="margin-bottom: 0;">
+          <div>
+            <h1 class="panel-title">⚡ Link-in-Bio Manager</h1>
+            <div id="connected-repo-badge" class="repo-badge">owner/repo (main)</div>
+          </div>
+          <div class="toolbar-row">
+            <a href="./index.html" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;">View Live</a>
+            <button type="button" id="logout-btn" class="btn btn-secondary btn-sm">Logout</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Core Link Creation UI (3 Inputs + 1 Main Action Button) -->
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Add New Link</h2>
+            <p class="panel-subtitle">Pushes directly to `links.json` via GitHub API.</p>
+          </div>
+        </div>
+
+        <form id="add-link-form">
+          <!-- INPUT 1: TEXT -->
+          <div class="form-group">
+            <div class="label-row">
+              <label for="link-text">1. Text (Button Label)</label>
+              <span id="char-counter" class="char-count">0 / 80</span>
+            </div>
+            <input
+              type="text"
+              id="link-text"
+              class="input-field"
+              placeholder="e.g. 🔥 Get the Exclusive Preset Pack (50% Off)"
+              maxlength="80"
+              required
+            />
+          </div>
+
+          <!-- INPUT 2: LINK -->
+          <div class="form-group">
+            <div class="label-row">
+              <label for="link-url">2. Link (Destination URL)</label>
+            </div>
+            <input
+              type="text"
+              id="link-url"
+              class="input-field"
+              placeholder="https://your-landing-page.com"
+              required
+            />
+          </div>
+
+          <!-- INPUT 3: COVER (1:1 SQUARE) -->
+          <div class="form-group">
+            <div class="label-row">
+              <label>3. Cover (1:1 Square Image)</label>
+            </div>
+
+            <div class="tabs" role="tablist">
+              <button type="button" class="tab-btn active" id="tab-upload-btn">Option A: Upload & Auto-Crop</button>
+              <button type="button" class="tab-btn" id="tab-url-btn">Option B: Direct Image URL</button>
+            </div>
+
+            <!-- Option A: File Upload with Auto 1:1 Center Crop -->
+            <div id="cover-upload-pane">
+              <div class="upload-zone" id="dropzone">
+                <input type="file" id="cover-file-input" accept="image/*" />
+                <img id="upload-preview-thumb" class="crop-thumb" alt="1:1 Crop preview" />
+                <div class="upload-meta">
+                  <div class="upload-title" id="upload-status-text">Tap to pick or drop an image</div>
+                  <div class="upload-hint">Auto center-crops & compresses to 300×300px 1:1 square</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Option B: Direct Image URL -->
+            <div id="cover-url-pane" class="hidden">
+              <input
+                type="url"
+                id="cover-url-input"
+                class="input-field"
+                placeholder="https://images.unsplash.com/photo-..."
+              />
+            </div>
+          </div>
+
+          <!-- LIVE PREVIEW CARD -->
+          <span class="preview-label">Live Hub Card Preview</span>
+          <div class="preview-box">
+            <div class="hub-preview-card">
+              <img id="live-preview-img" class="hub-preview-cover" alt="Preview Cover" />
+              <span id="live-preview-text" class="hub-preview-text">Your button label will appear here...</span>
+              <span class="hub-preview-arrow">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <!-- MAIN ACTION BUTTON: ADD LINK -->
+          <button type="submit" id="add-link-btn" class="btn btn-primary">
+            <span>Add Link</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- Existing Links Management & Fallback -->
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Existing Links (<span id="links-count">0</span>)</h2>
+            <p class="panel-subtitle">Reorder or delete active links. Changes auto-save to GitHub.</p>
+          </div>
+          <button type="button" id="download-json-btn" class="btn btn-secondary btn-sm">
+            Download `links.json`
+          </button>
+        </div>
+
+        <div id="existing-links-list" class="manage-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = 'tiktok_hub_gh_creds_v1';
+
+      const defaultPlaceholderCover = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%236366f1'/%3E%3Cstop offset='100%25' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='300' height='300' fill='url(%23g)'/%3E%3Cpath d='M120 180L180 120M180 120H135M180 120V165' stroke='white' stroke-width='12' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E";
+
+      // State
+      let creds = { owner: '', repo: '', branch: 'main', token: '' };
+      let currentLinks = [];
+      let currentFileSha = null;
+      let coverMode = 'upload'; // 'upload' | 'url'
+      let croppedBase64Cover = '';
+
+      // DOM Elements
+      const authScreen = document.getElementById('auth-screen');
+      const adminScreen = document.getElementById('admin-screen');
+      const authForm = document.getElementById('auth-form');
+      const authSubmitBtn = document.getElementById('auth-submit-btn');
+      const ghOwnerInput = document.getElementById('gh-owner');
+      const ghRepoInput = document.getElementById('gh-repo');
+      const ghBranchInput = document.getElementById('gh-branch');
+      const ghTokenInput = document.getElementById('gh-token');
+      const saveCredsCheckbox = document.getElementById('save-creds');
+      const repoBadge = document.getElementById('connected-repo-badge');
+      const logoutBtn = document.getElementById('logout-btn');
+
+      const addLinkForm = document.getElementById('add-link-form');
+      const linkTextInput = document.getElementById('link-text');
+      const linkUrlInput = document.getElementById('link-url');
+      const charCounter = document.getElementById('char-counter');
+      const tabUploadBtn = document.getElementById('tab-upload-btn');
+      const tabUrlBtn = document.getElementById('tab-url-btn');
+      const coverUploadPane = document.getElementById('cover-upload-pane');
+      const coverUrlPane = document.getElementById('cover-url-pane');
+      const coverFileInput = document.getElementById('cover-file-input');
+      const coverUrlInput = document.getElementById('cover-url-input');
+      const uploadPreviewThumb = document.getElementById('upload-preview-thumb');
+      const uploadStatusText = document.getElementById('upload-status-text');
+      const livePreviewImg = document.getElementById('live-preview-img');
+      const livePreviewText = document.getElementById('live-preview-text');
+      const addLinkBtn = document.getElementById('add-link-btn');
+      const existingLinksList = document.getElementById('existing-links-list');
+      const linksCountEl = document.getElementById('links-count');
+      const downloadJsonBtn = document.getElementById('download-json-btn');
+      const toastEl = document.getElementById('toast');
+
+      // Initialize default preview images
+      uploadPreviewThumb.src = defaultPlaceholderCover;
+      livePreviewImg.src = defaultPlaceholderCover;
+
+      // Toast helper
+      let toastTimer = null;
+      function showToast(message, type = 'success') {
+        clearTimeout(toastTimer);
+        toastEl.textContent = message;
+        toastEl.className = `toast show ${type}`;
+        toastTimer = setTimeout(() => {
+          toastEl.className = 'toast';
+        }, 3600);
+      }
+
+      // UTF-8 safe Base64 helpers for GitHub API
+      function utf8ToBase64(str) {
+        const bytes = new TextEncoder().encode(str);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary);
+      }
+
+      function base64ToUtf8(b64) {
+        const clean = b64.replace(/\s/g, '');
+        const binary = atob(clean);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+        return new TextDecoder().decode(bytes);
+      }
+
+      function normalizeUrl(rawUrl) {
+        const trimmed = (rawUrl || '').trim();
+        if (!trimmed) return 'https://';
+        if (/^https?:\/\//i.test(trimmed) || /^mailto:/i.test(trimmed) || /^tel:/i.test(trimmed)) {
+          return trimmed;
+        }
+        return 'https://' + trimmed;
+      }
+
+      function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+      }
+
+      // GitHub API Request Wrapper
+      async function githubRequest(endpoint, options = {}) {
+        const url = `https://api.github.com${endpoint}`;
+        const headers = Object.assign({
+          'Accept': 'application/vnd.github+json',
+          'Authorization': `Bearer ${creds.token}`,
+          'X-GitHub-Api-Version': '2022-11-28'
+        }, options.headers || {});
+
+        const response = await fetch(url, Object.assign({}, options, { headers, cache: 'no-store' }));
+        return response;
+      }
+
+      // Fetch current links.json from GitHub Repo
+      async function fetchLinksFromGitHub() {
+        const path = `/repos/${encodeURIComponent(creds.owner)}/${encodeURIComponent(creds.repo)}/contents/links.json?ref=${encodeURIComponent(creds.branch)}&t=${Date.now()}`;
+        const res = await githubRequest(path);
+
+        if (res.status === 404) {
+          currentLinks = [];
+          currentFileSha = null;
+          renderExistingLinks();
+          return;
+        }
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || `GitHub API Error (${res.status})`);
+        }
+
+        const data = await res.json();
+        currentFileSha = data.sha;
+        const decoded = base64ToUtf8(data.content);
+        const parsed = JSON.parse(decoded);
+        currentLinks = Array.isArray(parsed) ? parsed : [];
+        renderExistingLinks();
+      }
+
+      // Commit updated links.json back to GitHub Repo
+      async function commitLinksToGitHub(updatedLinks, commitMessage) {
+        const path = `/repos/${encodeURIComponent(creds.owner)}/${encodeURIComponent(creds.repo)}/contents/links.json`;
+
+        // Always fetch latest SHA first to avoid 409 conflict
+        const latestCheck = await githubRequest(`${path}?ref=${encodeURIComponent(creds.branch)}&t=${Date.now()}`);
+        if (latestCheck.ok) {
+          const latestData = await latestCheck.json();
+          currentFileSha = latestData.sha;
+        }
+
+        const jsonString = JSON.stringify(updatedLinks, null, 2);
+        const bodyPayload = {
+          message: commitMessage,
+          content: utf8ToBase64(jsonString),
+          branch: creds.branch
+        };
+
+        if (currentFileSha) {
+          bodyPayload.sha = currentFileSha;
+        }
+
+        const putRes = await githubRequest(path, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bodyPayload)
+        });
+
+        if (!putRes.ok) {
+          const errData = await putRes.json().catch(() => ({}));
+          throw new Error(errData.message || `Failed to commit links.json (${putRes.status})`);
+        }
+
+        const result = await putRes.json();
+        currentFileSha = result.content.sha;
+        currentLinks = updatedLinks;
+        renderExistingLinks();
+      }
+
+      // Verify credentials and unlock panel
+      async function verifyAndUnlock(e) {
+        if (e) e.preventDefault();
+
+        creds = {
+          owner: ghOwnerInput.value.trim(),
+          repo: ghRepoInput.value.trim(),
+          branch: ghBranchInput.value.trim() || 'main',
+          token: ghTokenInput.value.trim()
+        };
+
+        if (!creds.owner || !creds.repo || !creds.token) {
+          showToast('Please fill in all GitHub credentials.', 'error');
+          return;
+        }
+
+        authSubmitBtn.disabled = true;
+        authSubmitBtn.innerHTML = '<div class="spinner"></div><span>Verifying Token...</span>';
+
+        try {
+          const repoRes = await githubRequest(`/repos/${encodeURIComponent(creds.owner)}/${encodeURIComponent(creds.repo)}`);
+          if (!repoRes.ok) {
+            throw new Error('Invalid token or repository not found.');
+          }
+
+          const repoData = await repoRes.json();
+          if (repoData.permissions && !repoData.permissions.push) {
+            throw new Error('Token lacks write (push) permissions for this repository.');
+          }
+
+          if (saveCredsCheckbox.checked) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(creds));
+          } else {
+            localStorage.removeItem(STORAGE_KEY);
+          }
+
+          await fetchLinksFromGitHub();
+
+          repoBadge.textContent = `${creds.owner}/${creds.repo} (${creds.branch})`;
+          authScreen.classList.add('hidden');
+          adminScreen.classList.remove('hidden');
+          showToast('Unlocked! Connected to GitHub.', 'success');
+        } catch (err) {
+          showToast(err.message || 'Verification failed.', 'error');
+        } finally {
+          authSubmitBtn.disabled = false;
+          authSubmitBtn.innerHTML = '<span>Verify & Unlock Admin</span>';
+        }
+      }
+
+      // Auto-Square 1:1 Center-Crop via HTML5 Canvas (300x300 compressed WebP/JPEG)
+      function processImageFileToSquare(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            const img = new Image();
+            img.onload = function () {
+              const TARGET_SIZE = 300;
+              const canvas = document.createElement('canvas');
+              canvas.width = TARGET_SIZE;
+              canvas.height = TARGET_SIZE;
+              const ctx = canvas.getContext('2d');
+
+              // Calculate 1:1 center square crop
+              const minSide = Math.min(img.width, img.height);
+              const sx = (img.width - minSide) / 2;
+              const sy = (img.height - minSide) / 2;
+
+              ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, TARGET_SIZE, TARGET_SIZE);
+
+              // Try WebP first for smallest size, fallback to JPEG
+              let dataUrl = canvas.toDataURL('image/webp', 0.82);
+              if (!dataUrl.startsWith('data:image/webp')) {
+                dataUrl = canvas.toDataURL('image/jpeg', 0.84);
+              }
+              resolve(dataUrl);
+            };
+            img.onerror = () => reject(new Error('Could not decode image file.'));
+            img.src = event.target.result;
+          };
+          reader.onerror = () => reject(new Error('Failed to read file.'));
+          reader.readAsDataURL(file);
+        });
+      }
+
+      // Live Preview Updater
+      function updateLivePreview() {
+        const textVal = linkTextInput.value.trim();
+        charCounter.textContent = `${linkTextInput.value.length} / 80`;
+        livePreviewText.textContent = textVal || 'Your button label will appear here...';
+
+        let activeCover = defaultPlaceholderCover;
+        if (coverMode === 'upload' && croppedBase64Cover) {
+          activeCover = croppedBase64Cover;
+        } else if (coverMode === 'url' && coverUrlInput.value.trim()) {
+          activeCover = coverUrlInput.value.trim();
+        }
+        livePreviewImg.src = activeCover;
+      }
+
+      livePreviewImg.addEventListener('error', function () {
+        if (this.src !== defaultPlaceholderCover) {
+          this.src = defaultPlaceholderCover;
+        }
+      });
+
+      // Tab Switching for Cover Input
+      tabUploadBtn.addEventListener('click', () => {
+        coverMode = 'upload';
+        tabUploadBtn.classList.add('active');
+        tabUrlBtn.classList.remove('active');
+        coverUploadPane.classList.remove('hidden');
+        coverUrlPane.classList.add('hidden');
+        updateLivePreview();
+      });
+
+      tabUrlBtn.addEventListener('click', () => {
+        coverMode = 'url';
+        tabUrlBtn.classList.add('active');
+        tabUploadBtn.classList.remove('active');
+        coverUrlPane.classList.remove('hidden');
+        coverUploadPane.classList.add('hidden');
+        updateLivePreview();
+      });
+
+      // Handle File Selection
+      coverFileInput.addEventListener('change', async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        try {
+          uploadStatusText.textContent = 'Cropping to 1:1 square...';
+          croppedBase64Cover = await processImageFileToSquare(file);
+          uploadPreviewThumb.src = croppedBase64Cover;
+          uploadStatusText.textContent = `Ready: ${file.name} (300×300 1:1)`;
+          updateLivePreview();
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+      });
+
+      linkTextInput.addEventListener('input', updateLivePreview);
+      coverUrlInput.addEventListener('input', updateLivePreview);
+
+      // Add New Link Handler
+      addLinkForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const text = linkTextInput.value.trim();
+        const url = normalizeUrl(linkUrlInput.value);
+
+        let finalCover = defaultPlaceholderCover;
+        if (coverMode === 'upload') {
+          if (!croppedBase64Cover) {
+            showToast('Please select a cover image or switch to Option B (URL).', 'error');
+            return;
+          }
+          finalCover = croppedBase64Cover;
+        } else {
+          if (!coverUrlInput.value.trim()) {
+            showToast('Please enter a direct cover image URL.', 'error');
+            return;
+          }
+          finalCover = coverUrlInput.value.trim();
+        }
+
+        const newLinkItem = {
+          id: 'link-' + Date.now(),
+          text: text,
+          url: url,
+          cover: finalCover
+        };
+
+        addLinkBtn.disabled = true;
+        addLinkBtn.innerHTML = '<div class="spinner"></div><span>Publishing to GitHub...</span>';
+
+        try {
+          // Prepend newest link at the top of the hub
+          const updatedLinks = [newLinkItem, ...currentLinks];
+          await commitLinksToGitHub(updatedLinks, `Add link: ${text}`);
+
+          // Reset form
+          linkTextInput.value = '';
+          linkUrlInput.value = '';
+          coverFileInput.value = '';
+          coverUrlInput.value = '';
+          croppedBase64Cover = '';
+          uploadPreviewThumb.src = defaultPlaceholderCover;
+          uploadStatusText.textContent = 'Tap to pick or drop an image';
+          updateLivePreview();
+
+          showToast('Link added! Live page updated.', 'success');
+        } catch (err) {
+          showToast(err.message || 'Failed to add link.', 'error');
+        } finally {
+          addLinkBtn.disabled = false;
+          addLinkBtn.innerHTML = '<span>Add Link</span>';
+        }
+      });
+
+      // Render Existing Links with Move Up / Move Down / Delete
+      function renderExistingLinks() {
+        linksCountEl.textContent = currentLinks.length;
+        existingLinksList.innerHTML = '';
+
+        if (currentLinks.length === 0) {
+          existingLinksList.innerHTML = '<p style="color:var(--text-muted);font-size:0.88rem;text-align:center;padding:16px 0;">No links in `links.json` yet.</p>';
+          return;
+        }
+
+        currentLinks.forEach((item, index) => {
+          const row = document.createElement('div');
+          row.className = 'manage-item';
+
+          row.innerHTML = `
+            <img class="manage-cover" src="${escapeHtml(item.cover || defaultPlaceholderCover)}" alt="" />
+            <div class="manage-info">
+              <div class="manage-title">${escapeHtml(item.text)}</div>
+              <div class="manage-url">${escapeHtml(item.url)}</div>
+            </div>
+            <div class="manage-actions">
+              <button type="button" class="icon-btn move-up-btn" title="Move Up" ${index === 0 ? 'disabled' : ''}>↑</button>
+              <button type="button" class="icon-btn move-down-btn" title="Move Down" ${index === currentLinks.length - 1 ? 'disabled' : ''}>↓</button>
+              <button type="button" class="icon-btn danger delete-btn" title="Delete Link">✕</button>
+            </div>
+          `;
+
+          row.querySelector('.move-up-btn').addEventListener('click', () => moveLink(index, -1));
+          row.querySelector('.move-down-btn').addEventListener('click', () => moveLink(index, 1));
+          row.querySelector('.delete-btn').addEventListener('click', () => deleteLink(index));
+
+          existingLinksList.appendChild(row);
+        });
+      }
+
+      async function moveLink(index, direction) {
+        const targetIndex = index + direction;
+        if (targetIndex < 0 || targetIndex >= currentLinks.length) return;
+
+        const copy = [...currentLinks];
+        const temp = copy[index];
+        copy[index] = copy[targetIndex];
+        copy[targetIndex] = temp;
+
+        try {
+          showToast('Saving new order...', 'success');
+          await commitLinksToGitHub(copy, 'Reorder links');
+          showToast('Order updated on GitHub!', 'success');
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+      }
+
+      async function deleteLink(index) {
+        const target = currentLinks[index];
+        if (!target) return;
+
+        const copy = currentLinks.filter((_, i) => i !== index);
+        try {
+          showToast('Deleting link...', 'success');
+          await commitLinksToGitHub(copy, `Remove link: ${target.text}`);
+          showToast('Link deleted! Live page updated.', 'success');
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+      }
+
+      // Manual Fallback: Download links.json
+      downloadJsonBtn.addEventListener('click', () => {
+        const dataStr = JSON.stringify(currentLinks, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'links.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Downloaded links.json', 'success');
+      });
+
+      // Logout / Clear Token
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem(STORAGE_KEY);
+        creds = { owner: '', repo: '', branch: 'main', token: '' };
+        ghTokenInput.value = '';
+        adminScreen.classList.add('hidden');
+        authScreen.classList.remove('hidden');
+        showToast('Logged out & cleared saved token.', 'success');
+      });
+
+      authForm.addEventListener('submit', verifyAndUnlock);
+
+      // Auto-load saved credentials from localStorage on startup
+      const savedRaw = localStorage.getItem(STORAGE_KEY);
+      if (savedRaw) {
+        try {
+          const parsed = JSON.parse(savedRaw);
+          if (parsed.owner && parsed.repo && parsed.token) {
+            ghOwnerInput.value = parsed.owner;
+            ghRepoInput.value = parsed.repo;
+            ghBranchInput.value = parsed.branch || 'main';
+            ghTokenInput.value = parsed.token;
+            verifyAndUnlock();
+          }
+        } catch (_) {
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
